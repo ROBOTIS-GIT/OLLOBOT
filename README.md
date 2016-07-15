@@ -1,5 +1,7 @@
 #Example
 
+// bluetooth 2.0, connection pin number '0000'
+
 // stop
 
 Dynamixel.writeDWordPacket(200, 200, 0)
