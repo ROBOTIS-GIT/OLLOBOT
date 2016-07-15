@@ -19,7 +19,7 @@ Dynamixel.writeDWordPacket(200, 156, -(1024/8) + (-(1024/8) << 16))
 
 // keep moving
 
-// from -100 to 100, - value for left and back, + value for right and forward
+// from -100 to 100, - value for left(x) and back(y), + value for right(x) and forward(y)
 
 // CONTROLLER_X_AXIS_VALUE = 112
 
