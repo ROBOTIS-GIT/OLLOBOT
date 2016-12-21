@@ -16,11 +16,11 @@
 
 package com.robotis.ollobotsample;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Locale;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -29,6 +29,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -40,10 +41,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.text.Editable;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
@@ -51,7 +53,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,6 +79,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView mTvStatusPacket = null;
 	
 	private boolean mIsServiceBound = false;
+	
+	private SpeechRecognizer mRecognizer;
 	
 	/*****************************************************
 	 *	 Overrided methods
@@ -107,56 +110,68 @@ public class MainActivity extends Activity implements OnClickListener {
 		Button btnLedOn = (Button) findViewById(R.id.btn_led_on);
 		Button btnLedOff = (Button) findViewById(R.id.btn_led_off);
 		Button btnLedStatusf = (Button) findViewById(R.id.btn_led_status);
+		Button btnForward = (Button) findViewById(R.id.btn_forward);
+		Button btnBackward = (Button) findViewById(R.id.btn_backward);
+		Button btnLeft = (Button) findViewById(R.id.btn_left);
+		Button btnRight = (Button) findViewById(R.id.btn_right);
+		Button btnStop = (Button) findViewById(R.id.btn_stop);
+		Button btnVoice = (Button) findViewById(R.id.btn_voice);		
 		
 		btnLedOn.setOnClickListener(this);
 		btnLedOff.setOnClickListener(this);
 		btnLedStatusf.setOnClickListener(this);
+		btnForward.setOnClickListener(this);
+		btnBackward.setOnClickListener(this);
+		btnLeft.setOnClickListener(this);
+		btnRight.setOnClickListener(this);
+		btnStop.setOnClickListener(this);
+		btnVoice.setOnClickListener(this);
 		
 		// Setup IFTTT info.
-		final EditText etKey = (EditText) findViewById(R.id.et_ifttt_key);
-		etKey.setText(getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getString(Constants.PREFERENCE_IFTTT_KEY, ""));
-		etKey.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-			
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-			
-			@Override
-			public void afterTextChanged(Editable s) {
-				getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit().putString(Constants.PREFERENCE_IFTTT_KEY, s.toString()).commit();
-			}
-		});
-		
-		final EditText etEvent = (EditText) findViewById(R.id.et_ifttt_event);
-		etEvent.setText(getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getString(Constants.PREFERENCE_IFTTT_EVENT, ""));
-		etEvent.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-			
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-			
-			@Override
-			public void afterTextChanged(Editable s) {
-				getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit().putString(Constants.PREFERENCE_IFTTT_EVENT, s.toString()).commit();
-			}
-		});
-		
-		Button btnEvent = (Button) findViewById(R.id.btn_ifttt_event); 
-		btnEvent.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				new HttpTask().execute(etEvent.getText().toString(), etKey.getText().toString(), null);
-			}
-		});
+//		final EditText etKey = (EditText) findViewById(R.id.et_ifttt_key);
+//		etKey.setText(getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getString(Constants.PREFERENCE_IFTTT_KEY, ""));
+//		etKey.addTextChangedListener(new TextWatcher() {
+//			@Override
+//			public void onTextChanged(CharSequence s, int start, int before, int count) {
+//			}
+//			
+//			@Override
+//			public void beforeTextChanged(CharSequence s, int start, int count,
+//					int after) {
+//			}
+//			
+//			@Override
+//			public void afterTextChanged(Editable s) {
+//				getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit().putString(Constants.PREFERENCE_IFTTT_KEY, s.toString()).commit();
+//			}
+//		});
+//		
+//		final EditText etEvent = (EditText) findViewById(R.id.et_ifttt_event);
+//		etEvent.setText(getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).getString(Constants.PREFERENCE_IFTTT_EVENT, ""));
+//		etEvent.addTextChangedListener(new TextWatcher() {
+//			@Override
+//			public void onTextChanged(CharSequence s, int start, int before, int count) {
+//			}
+//			
+//			@Override
+//			public void beforeTextChanged(CharSequence s, int start, int count,
+//					int after) {
+//			}
+//			
+//			@Override
+//			public void afterTextChanged(Editable s) {
+//				getSharedPreferences(Constants.PREFERENCE_NAME, MODE_PRIVATE).edit().putString(Constants.PREFERENCE_IFTTT_EVENT, s.toString()).commit();
+//			}
+//		});
+//		
+//		Button btnEvent = (Button) findViewById(R.id.btn_ifttt_event); 
+//		btnEvent.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				new HttpTask().execute(etEvent.getText().toString(), etKey.getText().toString(), null);
+//			}
+//		});
 	}
 
 	@Override
@@ -281,6 +296,27 @@ public class MainActivity extends Activity implements OnClickListener {
 		startActivityForResult(intent, Constants.REQUEST_CONNECT_DEVICE);
 	}
 	
+	/**
+     * Showing google speech input dialog
+     * */
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 100);
+//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                "Speak now......");
+        try {
+            startActivityForResult(intent, Constants.REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    "Speech not supported.",
+                    Toast.LENGTH_SHORT).show(); 
+        }
+    }
+	
 	/*****************************************************
 	 *	Public classes
 	 ******************************************************/
@@ -314,6 +350,31 @@ public class MainActivity extends Activity implements OnClickListener {
 				Log.e(TAG, "BT is not enabled");
 				Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
 			}
+			break;
+		case Constants.REQ_CODE_SPEECH_INPUT:
+			if (resultCode == RESULT_OK && null != data) {
+				byte[] packet = null;
+				 
+                ArrayList<String> result = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                
+                for (int i = 0; i < result.size(); i++) {
+                	if ("go, cool, pool, call".indexOf(result.get(i).toLowerCase()) >= 0) { // for command go
+                		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
+                		break;
+                	} else if ("back, beck, bek".indexOf(result.get(i).toLowerCase()) >= 0) { // for command back.
+                		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
+                		break;
+                	}
+                }
+                
+                if (packet != null) {
+        			mService.sendMessageToRemote(packet);
+        			mTvInstructionPacket.setText(Dynamixel.packetToString(packet));
+        		} else {
+        			Toast.makeText(getApplicationContext(), result.toString(), Toast.LENGTH_LONG).show();
+        		}
+            }
 			break;
 		}	// End of switch(requestCode)
 	}
@@ -389,12 +450,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 	}	// End of class ActivityHandler
 
-
-
 	@Override
 	public void onClick(View v) {
 		byte[] packet = null;
 		switch (v.getId()) {
+			// See OLLOBOT.java for details.
+			// See OLLOBOT.java for details.
+			// See OLLOBOT.java for details.
 			case R.id.btn_led_on:
 				packet = Dynamixel.packetWriteByte(OLLOBOT.ID, OLLOBOT.Address.BLUE_LED, 1);
 				break;
@@ -404,8 +466,43 @@ public class MainActivity extends Activity implements OnClickListener {
 			case R.id.btn_led_status:
 				packet = Dynamixel.packetRead(OLLOBOT.ID, OLLOBOT.Address.BLUE_LED, OLLOBOT.Length.BLUE_LED);
 				break;
+			case R.id.btn_forward:
+				// go and stop.
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
+				// keep going.
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -512 + (512 << 16));
+//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 0 + (30 << 8)); // X:0, Y:30				
+				break;
+			case R.id.btn_backward:
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 512 + (-512 << 16));
+//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 0 + (-30 << 8)); // X:0, Y:-30
+				break;
+			case R.id.btn_left:
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, (1024/8) + ((1024/8) << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 0 + (512 << 16));
+//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, -30 + (10 << 8)); // X:-30, Y:10
+				break;
+			case R.id.btn_right:
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -(1024/8) + (-(1024/8) << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -512 + (0 << 16));
+//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 30 + (10 << 8)); // X:-30, Y:10
+				break;
+			case R.id.btn_stop:
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 0);
+				break;
+			case R.id.btn_voice:
+				promptSpeechInput();
+				// control in onActivityResult.
+				break;
 			default:
 				break;
+				
+//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.PORT_2_SERVO_POSITION, 512);
+//				packet = Dynamixel.packetWriteByte(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 50);
+				
+//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512);
+//				packet = Dynamixel.packetWriteByte(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, -50
 		}
 		
 		if (packet != null) {
