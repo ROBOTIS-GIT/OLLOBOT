@@ -54,6 +54,10 @@ public class OllobotAccessibilityService extends AccessibilityService {
 			        Intent intent = new Intent(ACTION_ACCESSIBILITY);
 		    		intent.putExtra(EXTRA_MSG, msg.toLowerCase());
 		    		sendBroadcast(intent);
+	    		} else {
+	    			Intent intent = new Intent(ACTION_ACCESSIBILITY);
+		    		intent.putExtra(EXTRA_MSG, eventText.toLowerCase());
+		    		sendBroadcast(intent);
 	    		}
 	    	}
     	}
