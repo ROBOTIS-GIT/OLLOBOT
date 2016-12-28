@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- <accessibility-service
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_service_description"
+    /> -->
+
+<!-- <accessibility-service
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeNotificationStateChanged"
+    android:accessibilityFeedbackType="feedbackSpoken"
+    android:notificationTimeout="100"
+    android:accessibilityFlags="flagDefault"
+    android:canRetrieveWindowContent="true" /> -->
+
+<!-- Target must be set to 4.0 or higher and the following settings are available. -->
+<!-- If you do not use the settings below, your accessibility will be turned off when the phone is rebooted or rebuilt, even if the accessibility service is turned on. -->
+    
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_service_description"
+    android:packageNames="@null"
+    android:accessibilityEventTypes="typeAllMask"
+    android:accessibilityFlags="flagDefault"
+    android:accessibilityFeedbackType="feedbackAllMask"
+    android:notificationTimeout="100"
+    android:canRetrieveWindowContent="true"
+    android:enabled="true"
+    android:settingsActivity="com.example.android.accessibility.ServiceSettingsActivity"
+/>

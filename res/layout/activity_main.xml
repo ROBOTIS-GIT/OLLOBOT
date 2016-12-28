@@ -172,7 +172,44 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="commands : go, back" />
+                    android:text="commands : forward backward, left, right" />
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50px"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/btn_notification"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Notification Set-Up" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="(If API leve 19 ~) Check ON of 'OLLOBOT Sample'\ncommands : forward backward, left, right\nTested with 'Google allo'" />
+            </LinearLayout>
+            
+            <LinearLayout
+                android:layout_marginTop="50px"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/btn_accessibility"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Accessibility Set-Up" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="(If ~ API leve 18) Check ON of 'OLLOBOT Sample'\ncommands : forward backward, left, right" />
             </LinearLayout>
 
             <!-- IFTTT Info -->

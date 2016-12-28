@@ -16,34 +16,24 @@
 
 package com.robotis.ollobotsample;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Locale;
-
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -59,6 +49,8 @@ import android.widget.Toast;
 
 import com.robotis.ollobotsample.bluetooth.BluetoothManager;
 import com.robotis.ollobotsample.service.BTConnectionService;
+import com.robotis.ollobotsample.service.NotificationService;
+import com.robotis.ollobotsample.service.OllobotAccessibilityService;
 import com.robotis.ollobotsample.utils.Constants;
 import com.robotis.ollobotsample.utils.Dynamixel;
 import com.robotis.ollobotsample.utils.OLLOBOT;
@@ -80,7 +72,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	
 	private boolean mIsServiceBound = false;
 	
-	private SpeechRecognizer mRecognizer;
+	private BroadcastReceiver mStatusbarBr;
+	private BroadcastReceiver mNotificationBr;
 	
 	/*****************************************************
 	 *	 Overrided methods
@@ -116,6 +109,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		Button btnRight = (Button) findViewById(R.id.btn_right);
 		Button btnStop = (Button) findViewById(R.id.btn_stop);
 		Button btnVoice = (Button) findViewById(R.id.btn_voice);		
+		Button btnNotification = (Button) findViewById(R.id.btn_notification);
+		Button btnAccessibility = (Button) findViewById(R.id.btn_accessibility);
 		
 		btnLedOn.setOnClickListener(this);
 		btnLedOff.setOnClickListener(this);
@@ -126,6 +121,66 @@ public class MainActivity extends Activity implements OnClickListener {
 		btnRight.setOnClickListener(this);
 		btnStop.setOnClickListener(this);
 		btnVoice.setOnClickListener(this);
+		btnNotification.setOnClickListener(this);
+		btnAccessibility.setOnClickListener(this);
+		
+		// Notification Service (API level 18+)
+		mNotificationBr = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				String msg = intent.getStringExtra("text");
+				byte[] packet = null;
+				
+            	if ("forward".equalsIgnoreCase(msg)) { // for command forward
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
+            	} else if ("backward".equalsIgnoreCase(msg)) { // for command backward.
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
+            	} else if ("left".equalsIgnoreCase(msg)) { // for command left.
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, (1024/8) + ((1024/8) << 16));
+            	} else if ("right".equalsIgnoreCase(msg)) { // for command right.
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -(1024/8) + (-(1024/8) << 16));
+            	}
+            	
+                if (packet != null) {
+        			mService.sendMessageToRemote(packet);
+        			mTvInstructionPacket.setText(Dynamixel.packetToString(packet));
+        		}
+                
+                Toast.makeText(getApplicationContext(), "[" + msg + "] received.", Toast.LENGTH_SHORT).show();
+                Log.i("ROBOTIS", "# notification : [" + msg + "]");
+			}
+		};
+		IntentFilter notificationFilter = new IntentFilter(NotificationService.ACTION_NOTI_RECEIVED);
+		registerReceiver(mNotificationBr, notificationFilter);
+		
+		// Accessibility Service (API level 18, 18-)
+		mStatusbarBr = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				String msg = intent.getStringExtra(OllobotAccessibilityService.EXTRA_MSG);
+				byte[] packet = null;
+				
+				if ("forward".equalsIgnoreCase(msg)) { // for command forward
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
+            	} else if ("backward".equalsIgnoreCase(msg)) { // for command backward.
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
+            	} else if ("left".equalsIgnoreCase(msg)) { // for command left.
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, (1024/8) + ((1024/8) << 16));
+            	} else if ("right".equalsIgnoreCase(msg)) { // for command right.
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -(1024/8) + (-(1024/8) << 16));
+            	}
+                
+                if (packet != null) {
+        			mService.sendMessageToRemote(packet);
+        			mTvInstructionPacket.setText(Dynamixel.packetToString(packet));
+        		}
+                
+                Toast.makeText(getApplicationContext(), "[" + msg + "] received.", Toast.LENGTH_SHORT).show();
+                Log.i("ROBOTIS", "# Status : [" + msg + "]");
+			}
+		};
+		IntentFilter statusbarFilter = new IntentFilter(OllobotAccessibilityService.ACTION_ACCESSIBILITY);
+		registerReceiver(mStatusbarBr, statusbarFilter);
 		
 		// Setup IFTTT info.
 //		final EditText etKey = (EditText) findViewById(R.id.et_ifttt_key);
@@ -194,6 +249,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		if (mService != null && mService.getBtStatus() != BluetoothManager.STATE_CONNECTED) {
 			doStopService();
 		}
+
+		if (mNotificationBr != null) unregisterReceiver(mNotificationBr);
+		if (mStatusbarBr != null) unregisterReceiver(mStatusbarBr);
 		
 		super.onDestroy();
 	}
@@ -359,11 +417,17 @@ public class MainActivity extends Activity implements OnClickListener {
                         .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 
                 for (int i = 0; i < result.size(); i++) {
-                	if ("go, cool, pool, call".indexOf(result.get(i).toLowerCase()) >= 0) { // for command go
+                	if ("forward, ford, fort, fought, hot, food, flood".indexOf(result.get(i).toLowerCase()) >= 0) { // for command forward.
                 		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
                 		break;
-                	} else if ("back, beck, bek".indexOf(result.get(i).toLowerCase()) >= 0) { // for command back.
+                	} else if ("backward, backwood, banquet, backyard, back, beck, bek".indexOf(result.get(i).toLowerCase()) >= 0) { // for command back.
                 		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
+                		break;
+                	} else if ("left, lyft, lift, laugh, lab, loft".indexOf(result.get(i).toLowerCase()) >= 0) { // for command left.
+                		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, (1024/8) + ((1024/8) << 16));
+                		break;
+                	} else if ("right, white, light, wright, write".indexOf(result.get(i).toLowerCase()) >= 0) { // for command right.
+                		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -(1024/8) + (-(1024/8) << 16));
                 		break;
                 	}
                 }
@@ -371,9 +435,10 @@ public class MainActivity extends Activity implements OnClickListener {
                 if (packet != null) {
         			mService.sendMessageToRemote(packet);
         			mTvInstructionPacket.setText(Dynamixel.packetToString(packet));
-        		} else {
-        			Toast.makeText(getApplicationContext(), result.toString(), Toast.LENGTH_LONG).show();
         		}
+                
+                Toast.makeText(getApplicationContext(), "[" + result.toString() + "] received.", Toast.LENGTH_SHORT).show();
+                Log.i("ROBOTIS", "# Voice : [" + result.toString() + "]");
             }
 			break;
 		}	// End of switch(requestCode)
@@ -495,14 +560,18 @@ public class MainActivity extends Activity implements OnClickListener {
 				promptSpeechInput();
 				// control in onActivityResult.
 				break;
+			case R.id.btn_notification: {
+				Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+				startActivity(intent);
+				break;
+			}
+			case R.id.btn_accessibility: {
+				Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+				startActivity(intent);
+				break;
+			}
 			default:
 				break;
-				
-//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.PORT_2_SERVO_POSITION, 512);
-//				packet = Dynamixel.packetWriteByte(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 50);
-				
-//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512);
-//				packet = Dynamixel.packetWriteByte(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, -50
 		}
 		
 		if (packet != null) {
@@ -514,58 +583,58 @@ public class MainActivity extends Activity implements OnClickListener {
 		mTvStatusPacket.setText("");
 	}
 	
-	class HttpTask extends AsyncTask<String, Void, String> {
-		@Override
-		protected String doInBackground(String... params) {
-			URL url = null;
-			HttpURLConnection conn = null;
-			
+//	class HttpTask extends AsyncTask<String, Void, String> {
+//		@Override
+//		protected String doInBackground(String... params) {
+//			URL url = null;
+//			HttpURLConnection conn = null;
+//			
+////			try {
+////				url = new URL("https://maker.ifttt.com/trigger/" + params[0] + "/with/key/" + params[1]);
+////				Log.i("ROBOTIS", "https://maker.ifttt.com/trigger/" + params[0] + "/with/key/" + params[1]);
+////				conn = (HttpURLConnection) url.openConnection();
+////				String dataUrlParameters = "";
+////				
+////				// Create connection
+////				conn.setRequestMethod("GET");
+////				conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+////				conn.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
+////				conn.setRequestProperty("Content-Language", "en-US");
+////				conn.setUseCaches(false);
+////				conn.setDoInput(true);
+////				conn.setDoOutput(true);
+////				// Send request
+////				DataOutputStream wr = new DataOutputStream(
+////						conn.getOutputStream());
+//////				wr.writeBytes(dataUrlParameters);
+////				wr.flush();
+////				wr.close();
+////				
+////				Log.i("ROBOTIS", "send.");
+////			} catch (MalformedURLException e) {
+////				Log.i("ROBOTIS", e.toString());
+////			} catch (IOException e) {
+////				Log.i("ROBOTIS", e.toString());
+////			}
+//			
+//			HttpClient httpClient = new DefaultHttpClient();
 //			try {
-//				url = new URL("https://maker.ifttt.com/trigger/" + params[0] + "/with/key/" + params[1]);
-//				Log.i("ROBOTIS", "https://maker.ifttt.com/trigger/" + params[0] + "/with/key/" + params[1]);
-//				conn = (HttpURLConnection) url.openConnection();
-//				String dataUrlParameters = "";
-//				
-//				// Create connection
-//				conn.setRequestMethod("GET");
-//				conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
-//				conn.setRequestProperty("Content-Length","" + Integer.toString(dataUrlParameters.getBytes().length));
-//				conn.setRequestProperty("Content-Language", "en-US");
-//				conn.setUseCaches(false);
-//				conn.setDoInput(true);
-//				conn.setDoOutput(true);
-//				// Send request
-//				DataOutputStream wr = new DataOutputStream(
-//						conn.getOutputStream());
-////				wr.writeBytes(dataUrlParameters);
-//				wr.flush();
-//				wr.close();
-//				
-//				Log.i("ROBOTIS", "send.");
-//			} catch (MalformedURLException e) {
-//				Log.i("ROBOTIS", e.toString());
+//				httpClient.execute(new HttpGet("https://maker.ifttt.com/trigger/" + params[0] + "/with/key/" + params[1]));
+//				Log.i("ROBOTIS", "send");
+//			} catch (ClientProtocolException e) {
+//				Log.e("ROBOTIS", e.toString());
 //			} catch (IOException e) {
-//				Log.i("ROBOTIS", e.toString());
+//				Log.e("ROBOTIS", e.toString());
 //			}
-			
-			HttpClient httpClient = new DefaultHttpClient();
-			try {
-				httpClient.execute(new HttpGet("https://maker.ifttt.com/trigger/" + params[0] + "/with/key/" + params[1]));
-				Log.i("ROBOTIS", "send");
-			} catch (ClientProtocolException e) {
-				Log.e("ROBOTIS", e.toString());
-			} catch (IOException e) {
-				Log.e("ROBOTIS", e.toString());
-			}
-			
-			if (conn != null) {
-				conn.disconnect();
-			}
-			
-			if (conn != null) {
-				conn.disconnect();
-			}
-			return null;
-		}
-	}
+//			
+//			if (conn != null) {
+//				conn.disconnect();
+//			}
+//			
+//			if (conn != null) {
+//				conn.disconnect();
+//			}
+//			return null;
+//		}
+//	}
 }
