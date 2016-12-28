@@ -69,6 +69,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private TextView mTvInstructionPacket = null;
 	private TextView mTvStatusPacket = null;
+	private TextView mTvNotificationMsg = null;
+	private TextView mTvStatusMsg = null;
+	private TextView mTvVoiceMsg = null;
 	
 	private boolean mIsServiceBound = false;
 	
@@ -98,6 +101,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		mTvInstructionPacket = (TextView) findViewById(R.id.tv_instruction_packet);
 		mTvStatusPacket = (TextView) findViewById(R.id.tv_status_packet);
+		mTvNotificationMsg = (TextView) findViewById(R.id.tv_notification_msg);
+		mTvStatusMsg = (TextView) findViewById(R.id.tv_status_msg);
+		mTvVoiceMsg = (TextView) findViewById(R.id.tv_voice_msg);
 		
 		// Setup button for H/W test
 		Button btnLedOn = (Button) findViewById(R.id.btn_led_on);
@@ -146,8 +152,7 @@ public class MainActivity extends Activity implements OnClickListener {
         			mTvInstructionPacket.setText(Dynamixel.packetToString(packet));
         		}
                 
-                Toast.makeText(getApplicationContext(), "[" + msg + "] received.", Toast.LENGTH_SHORT).show();
-                Log.i("ROBOTIS", "# notification : [" + msg + "]");
+                mTvNotificationMsg.setText(msg);
 			}
 		};
 		IntentFilter notificationFilter = new IntentFilter(NotificationService.ACTION_NOTI_RECEIVED);
@@ -174,9 +179,7 @@ public class MainActivity extends Activity implements OnClickListener {
         			mService.sendMessageToRemote(packet);
         			mTvInstructionPacket.setText(Dynamixel.packetToString(packet));
         		}
-                
-                Toast.makeText(getApplicationContext(), "[" + msg + "] received.", Toast.LENGTH_SHORT).show();
-                Log.i("ROBOTIS", "# Status : [" + msg + "]");
+                mTvStatusMsg.setText(msg);                
 			}
 		};
 		IntentFilter statusbarFilter = new IntentFilter(OllobotAccessibilityService.ACTION_ACCESSIBILITY);
@@ -437,7 +440,8 @@ public class MainActivity extends Activity implements OnClickListener {
         			mTvInstructionPacket.setText(Dynamixel.packetToString(packet));
         		}
                 
-                Toast.makeText(getApplicationContext(), "[" + result.toString() + "] received.", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "[" + result.toString() + "] received.", Toast.LENGTH_SHORT).show();
+                mTvVoiceMsg.setText(result.toString());
                 Log.i("ROBOTIS", "# Voice : [" + result.toString() + "]");
             }
 			break;
