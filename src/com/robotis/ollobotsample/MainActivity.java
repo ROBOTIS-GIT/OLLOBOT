@@ -539,12 +539,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				// go and stop.
 //				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
 				// keep going.
-				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -512 + (512 << 16));
-//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 0 + (30 << 8)); // X:0, Y:30				
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -512 + (512 << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, (-512 & 0xFFFF) + (512 << 16));
+//				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 0 + (30 << 8)); // X:0, Y:30
 				break;
 			case R.id.btn_backward:
 //				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
-				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 512 + (-512 << 16));
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 512 + (-512 << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 512 + ((-512 & 0xFFFF) << 16));
 //				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 0 + (-30 << 8)); // X:0, Y:-30
 				break;
 			case R.id.btn_left:
@@ -554,7 +556,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				break;
 			case R.id.btn_right:
 //				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -(1024/8) + (-(1024/8) << 16));
-				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -512 + (0 << 16));
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -512 + (0 << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, (-512 & 0xFFFF) + (0 << 16));
 //				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 30 + (10 << 8)); // X:-30, Y:10
 				break;
 			case R.id.btn_stop:
