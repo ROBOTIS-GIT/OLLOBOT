@@ -18,8 +18,10 @@ public class OLLOBOT {
 		// - X for left, - Y for backward.
 		// + X for right, + Y for forward.
 		// Speed will be set automatically by the value.
-		public static final int CONTROLLER_X_AXIS_VALUE = 112;	// -100 ~ 100
-		public static final int CONTROLLER_Y_AXIS_VALUE = 113;	// -100 ~ 100
+		
+		//deplecated. 2017.05.19
+		//public static final int CONTROLLER_X_AXIS_VALUE = 112;	// -100 ~ 100
+		//public static final int CONTROLLER_Y_AXIS_VALUE = 113;	// -100 ~ 100
 		
 		// About Motor_speed.
 		// + for clockwize, - for counterclockwise.
