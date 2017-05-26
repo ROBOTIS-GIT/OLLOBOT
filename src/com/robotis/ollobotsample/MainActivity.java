@@ -138,9 +138,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				byte[] packet = null;
 				
             	if ("forward".equalsIgnoreCase(msg)) { // for command forward
-            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -100 + (100 << 16));
             	} else if ("backward".equalsIgnoreCase(msg)) { // for command backward.
-            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 100 + (-100 << 16));
             	} else if ("left".equalsIgnoreCase(msg)) { // for command left.
             		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, (1024/8) + ((1024/8) << 16));
             	} else if ("right".equalsIgnoreCase(msg)) { // for command right.
@@ -166,9 +166,9 @@ public class MainActivity extends Activity implements OnClickListener {
 				byte[] packet = null;
 				
 				if ("forward".equalsIgnoreCase(msg)) { // for command forward
-            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -100 + (100 << 16));
             	} else if ("backward".equalsIgnoreCase(msg)) { // for command backward.
-            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
+            		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 100 + (-100 << 16));
             	} else if ("left".equalsIgnoreCase(msg)) { // for command left.
             		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, (1024/8) + ((1024/8) << 16));
             	} else if ("right".equalsIgnoreCase(msg)) { // for command right.
@@ -421,10 +421,10 @@ public class MainActivity extends Activity implements OnClickListener {
                 
                 for (int i = 0; i < result.size(); i++) {
                 	if ("forward, ford, fort, fought, hot, food, flood".indexOf(result.get(i).toLowerCase()) >= 0) { // for command forward.
-                		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
+                		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -100 + (100 << 16));
                 		break;
                 	} else if ("backward, backwood, banquet, backyard, back, beck, bek".indexOf(result.get(i).toLowerCase()) >= 0) { // for command back.
-                		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
+                		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 100 + (-100 << 16));
                 		break;
                 	} else if ("left, lyft, lift, laugh, lab, loft".indexOf(result.get(i).toLowerCase()) >= 0) { // for command left.
                 		packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, (1024/8) + ((1024/8) << 16));
@@ -537,27 +537,27 @@ public class MainActivity extends Activity implements OnClickListener {
 				break;
 			case R.id.btn_forward:
 				// go and stop.
-//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -512 + (512 << 16));
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -100 + (100 << 16));
 				// keep going.
-//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -512 + (512 << 16));
-				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, (-512 & 0xFFFF) + (512 << 16));
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -100 + (100 << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, (-100 & 0xFFFF) + (100 << 16));
 //				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 0 + (30 << 8)); // X:0, Y:30
 				break;
 			case R.id.btn_backward:
-//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 512 + (-512 << 16));
-//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 512 + (-512 << 16));
-				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 512 + ((-512 & 0xFFFF) << 16));
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, 100 + (-100 << 16));
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 100 + (-100 << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 100 + ((-100 & 0xFFFF) << 16));
 //				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 0 + (-30 << 8)); // X:0, Y:-30
 				break;
 			case R.id.btn_left:
 //				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, (1024/8) + ((1024/8) << 16));
-				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 0 + (512 << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, 0 + (100 << 16));
 //				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, -30 + (10 << 8)); // X:-30, Y:10
 				break;
 			case R.id.btn_right:
 //				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_SERVO_POSITION, -(1024/8) + (-(1024/8) << 16));
-//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -512 + (0 << 16));
-				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, (-512 & 0xFFFF) + (0 << 16));
+//				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, -100 + (0 << 16));
+				packet = Dynamixel.packetWriteDWord(OLLOBOT.ID, OLLOBOT.Address.PORT_1_MOTOR_SPEED, (-100 & 0xFFFF) + (0 << 16));
 //				packet = Dynamixel.packetWriteWord(OLLOBOT.ID, OLLOBOT.Address.CONTROLLER_X_AXIS_VALUE, 30 + (10 << 8)); // X:-30, Y:10
 				break;
 			case R.id.btn_stop:
